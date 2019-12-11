@@ -2,6 +2,7 @@ import sys
 import argparse
 import os
 import datetime
+from com.azeezadewale.key_value_db import KeyValueDB, KeyValueObject
 
 backup_path =  "../"
 
@@ -13,44 +14,52 @@ def change_variable_name(source_file_path, type, new_name):
     #new_name = wild_card_resolver(new_name, type)
     content = file_reader(source_file_path)
     
-    variables_to_modify_actual = []
-    variables_to_modify_value = []
+    variables_to_modify = KeyValueDB()
     operation = Ops.Unknown
     line_ended = False
     last_token = ""
     previous_identifier = ""
     current_identifier = ""
     punctuations = "`¬!\"£$%^&*()_-=+\\|,<.>/?;:'@#~]}[{"
+    new_content = ""
     for index in range(0, len(content) - 1):
         char = content[index]
+        while index < len(content) - 1 and content[index].isspace():
+            index += 1
+            continue
+        next_char = (content[index] if (index < len(content) - 1) else char)
         if char.isalnum():
             current_identifier += char
         elif char == ";" or char == "=":
+            new_variable_name = current_identifier
             if operation == Ops.ParsingVar and not current_identifier == "":
                 new_variable_name = wild_card_resolver(new_name, current_identifier)
-                variables_to_modify_actual.append(current_identifier)
-                variables_to_modify_value.append(new_variable_name)
+                variables_to_modify.add(current_identifier, new_variable_name)
             line_ended = True
+            new_content += new_variable_name + char
             current_identifier = ""
             operation = Ops.Unknown
         else:
             if current_identifier != "":
+                new_variable_name = current_identifier
                 if previous_identifier == type and last_token not in punctuations:
                     operation = Ops.ParsingVar
                     new_variable_name = wild_card_resolver(new_name, current_identifier)
-                    variables_to_modify_actual.append(current_identifier)
-                    variables_to_modify_value.append(new_variable_name)
+                    variables_to_modify.add(current_identifier, new_variable_name)
                 elif operation == Ops.ParsingVar:
                     new_variable_name = wild_card_resolver(new_name, current_identifier)
-                    variables_to_modify_actual.append(current_identifier)
-                    variables_to_modify_value.append(new_variable_name)
+                    variables_to_modify.add(current_identifier, new_variable_name)
+                new_variable_name = variables_to_modify.get(current_identifier) 
+                if not new_variable_name == "" and next_char not in "(":
+                    new_content += new_variable_name
+                else:
+                    new_content += current_identifier
             previous_identifier = current_identifier
             current_identifier = ""
-            last_token =  char
-            
-    print(variables_to_modify_actual)
-    print(variables_to_modify_value)
-    
+            last_token = char
+            new_content += char
+    print(variables_to_modify)
+    #file_writer(source_file_path, new_content)
     #file_backup(os.path.basename(source_file_path), content)
     
 def wild_card_resolver(raw_str, master_str):
