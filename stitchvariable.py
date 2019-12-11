@@ -60,7 +60,7 @@ def change_variable_name(source_file_path, type, new_name):
             new_content += char
     print(variables_to_modify)
     #file_writer(source_file_path, new_content)
-    #file_backup(os.path.basename(source_file_path), content)
+    file_backup(os.path.basename(source_file_path), content)
     
 def wild_card_resolver(raw_str, master_str):
     resolved_str = ""
@@ -85,7 +85,7 @@ def file_writer(source_file_path, content):
     f.close()
     
 def file_backup(file_name, content):
-    file_writer(os.path.realpath(backup_path) + os.sep + file_name + datetime.datetime.today().strftime('%m-%d-%Y') + ".java", content)
+    file_writer(os.path.realpath(backup_path) + os.sep + file_name + datetime.datetime.today().strftime('%m-%d-%Y-%H-%M-%S') + ".java", content)
     
 def screw_the_offside_rule():
     print(end='')
