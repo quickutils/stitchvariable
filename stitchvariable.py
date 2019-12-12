@@ -2,16 +2,17 @@ import sys
 import argparse
 import os
 import datetime
-from com.azeezadewale.key_value_db import KeyValueDB, KeyValueObject
+from key_value_db import KeyValueDB, KeyValueObject
 
-backup_path =  "../"
+backup_path =  os.getenv('TMP') + "/stitchvariable/" if not os.getenv('TMP') == "" else "../tmp/stitchvariable/"
+if not os.path.exists(backup_path):
+    os.makedirs(backup_path)
 
 class Ops:
     Unknown    = 0
     ParsingVar = 1
 
 def change_variable_name(source_file_path, type, new_name):
-    #new_name = wild_card_resolver(new_name, type)
     content = file_reader(source_file_path)
     
     variables_to_modify = KeyValueDB()
@@ -58,9 +59,14 @@ def change_variable_name(source_file_path, type, new_name):
             current_identifier = ""
             last_token = char
             new_content += char
-    print(variables_to_modify)
-    #file_writer(source_file_path, new_content)
-    file_backup(os.path.basename(source_file_path), content)
+    
+    for variable in variables_to_modify:
+        print(variable.key, "=>", variable.value)
+    file_writer(source_file_path, new_content)
+    file_backup_path = file_backup(os.path.basename(source_file_path), content)
+    print()
+    print("Modified the variable names in", os.path.basename(source_file_path))
+    print("Backup created at", file_backup_path)
     
 def wild_card_resolver(raw_str, master_str):
     resolved_str = ""
@@ -85,7 +91,9 @@ def file_writer(source_file_path, content):
     f.close()
     
 def file_backup(file_name, content):
-    file_writer(os.path.realpath(backup_path) + os.sep + file_name + datetime.datetime.today().strftime('%m-%d-%Y-%H-%M-%S') + ".java", content)
+    file_backup_path = os.path.realpath(backup_path) + os.sep + file_name + datetime.datetime.today().strftime('%m-%d-%Y-%H-%M-%S') + ".java"
+    file_writer(file_backup_path, content)
+    return file_backup_path
     
 def screw_the_offside_rule():
     print(end='')
