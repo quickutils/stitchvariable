@@ -13,7 +13,7 @@ class Ops:
     ParsingVar = 1
 
 def change_variable_name(source_file_path, type, new_name):
-    content = file_reader(source_file_path)
+    content = file_reader(source_file_path) + " "
     
     variables_to_modify = KeyValueDB()
     operation = Ops.Unknown
@@ -33,7 +33,7 @@ def change_variable_name(source_file_path, type, new_name):
             current_identifier += char
         elif char == ";" or char == "=":
             new_variable_name = current_identifier
-            if operation == Ops.ParsingVar and not current_identifier == "":
+            if (operation == Ops.ParsingVar or previous_identifier == type) and not current_identifier == "":
                 new_variable_name = wild_card_resolver(new_name, current_identifier)
                 variables_to_modify.add(current_identifier, new_variable_name)
             line_ended = True
