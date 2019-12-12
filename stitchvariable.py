@@ -28,7 +28,7 @@ def change_variable_name(source_file_path, type, new_name):
         while index < len(content) - 1 and content[index].isspace():
             index += 1
             continue
-        next_char = (content[index] if (index < len(content) - 1) else char)
+        next_char = (content[index+1] if (index < len(content) - 1) else char)
         if char.isalnum():
             current_identifier += char
         elif char == ";" or char == "=":
@@ -51,11 +51,11 @@ def change_variable_name(source_file_path, type, new_name):
                     new_variable_name = wild_card_resolver(new_name, current_identifier)
                     variables_to_modify.add(current_identifier, new_variable_name)
                 new_variable_name = variables_to_modify.get(current_identifier) 
-                if not new_variable_name == "" and next_char not in "(":
+                if not new_variable_name == "" and char not in "(":
                     new_content += new_variable_name
                 else:
                     new_content += current_identifier
-            previous_identifier = current_identifier
+                previous_identifier = current_identifier
             current_identifier = ""
             last_token = char
             new_content += char
