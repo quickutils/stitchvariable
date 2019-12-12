@@ -39,6 +39,7 @@ def change_variable_name(source_file_path, type, new_name):
             line_ended = True
             new_content += new_variable_name + char
             current_identifier = ""
+            previous_identifier = ""
             operation = Ops.Unknown
         else:
             if current_identifier != "":
